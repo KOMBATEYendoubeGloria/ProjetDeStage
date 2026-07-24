@@ -4,6 +4,7 @@ from .views import (
     RegisterView, MeView, LoginView,
     GithubAuthURLView, GithubCallbackView,
     GoogleAuthURLView, GoogleCallbackView,
+    UtilisateurListView, UtilisateurDetailView, ChangerRoleView,
 )
 
 urlpatterns = [
@@ -15,4 +16,7 @@ urlpatterns = [
     path('github/callback/', GithubCallbackView.as_view(), name='github-callback'),
     path('google/url/', GoogleAuthURLView.as_view(), name='google-url'),
     path('google/callback/', GoogleCallbackView.as_view(), name='google-callback'),
+    path('users/', UtilisateurListView.as_view(), name='user-list'),
+    path('users/<int:pk>/', UtilisateurDetailView.as_view(), name='user-detail'),
+    path('users/<int:pk>/role/', ChangerRoleView.as_view(), name='user-role'),
 ]

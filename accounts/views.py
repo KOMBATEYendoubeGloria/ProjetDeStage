@@ -1,3 +1,6 @@
+from rest_framework import generics, permissions, status
+from rest_framework.response import Response
+from .permissions import IsAdmin, IsAdminOrSelf
 from django.contrib.auth import login
 from django.shortcuts import redirect
 from django.http import JsonResponse
@@ -192,4 +195,58 @@ class GoogleCallbackView(APIView):
                 'role': user.role,
                 'created': created,
             }
+        })    
+
+
+
+
+class UtilisateurListView(generics.ListAPIView):
+    """Liste tous les utilisateurs — réservé aux Admins"""
+    serializer_class = UtilisateurSerializer
+    permission_classes = [IsAdmin]
+
+    def get_queryset(self):
+        queryset = Utilisateur.objects.all()
+        # Filtrage optionnel par rôle : /api/auth/users/?role=ADMIN
+        role = self.request.query_params.get('role')
+        if role:
+            queryset = queryset.filter(role=role)
+        return queryset
+
+
+class UtilisateurDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """Détail, modification et suppression d'un utilisateur"""
+    serializer_class = UtilisateurSerializer
+    permission_classes = [permissions.IsAuthenticated, IsAdminOrSelf]
+    queryset = Utilisateur.objects.all()
+
+    def update(self, request, *args, **kwargs):
+        # Seul un Admin peut changer le rôle
+        if 'role' in request.data and request.user.role != 'ADMIN':
+            return Response(
+                {'error': 'Seul un Admin peut modifier le rôle'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        return super().update(request, *args, **kwargs)
+
+
+class ChangerRoleView(generics.UpdateAPIView):
+    """Changer le rôle d'un utilisateur — réservé aux Admins"""
+    serializer_class = UtilisateurSerializer
+    permission_classes = [IsAdmin]
+    queryset = Utilisateur.objects.all()
+
+    def patch(self, request, *args, **kwargs):
+        user = self.get_object()
+        role = request.data.get('role')
+        if role not in ['ADMIN', 'DEVOPS']:
+            return Response(
+                {'error': 'Rôle invalide. Choisir ADMIN ou DEVOPS'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        user.role = role
+        user.save()
+        return Response({
+            'message': f"Rôle de {user.username} changé en {role}",
+            'user': UtilisateurSerializer(user).data
         })    
