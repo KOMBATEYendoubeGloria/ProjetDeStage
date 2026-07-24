@@ -1,0 +1,7 @@
+pipeline {
+    agent { docker { image 'php:8.2' } }
+    stages {
+        stage('Install') { steps { sh 'composer install' } }
+        stage('Test') { steps { sh 'php artisan test' } }
+    }
+}

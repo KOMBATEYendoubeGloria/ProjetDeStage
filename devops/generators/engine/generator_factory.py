@@ -2,13 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, Mapping, Type
-
-from ..interfaces.ansible_generator import AnsibleGeneratorInterface
-from ..interfaces.docker_generator import DockerGeneratorInterface
-from ..interfaces.environment_generator import EnvironmentGeneratorInterface
-from ..interfaces.pipeline_generator import PipelineGeneratorInterface
-from ..interfaces.terraform_generator import TerraformGeneratorInterface
+from typing import Any, Dict, Type
 
 
 class GeneratorFactory:
@@ -27,9 +21,3 @@ class GeneratorFactory:
             raise ValueError(f'No generator registered for artifact type: {artifact_type}')
         return generator_cls()
 
-
-GeneratorFactory.register('docker', type('DockerGeneratorDefault', (DockerGeneratorInterface,), {}))
-GeneratorFactory.register('terraform', type('TerraformGeneratorDefault', (TerraformGeneratorInterface,), {}))
-GeneratorFactory.register('ansible', type('AnsibleGeneratorDefault', (AnsibleGeneratorInterface,), {}))
-GeneratorFactory.register('pipeline', type('PipelineGeneratorDefault', (PipelineGeneratorInterface,), {}))
-GeneratorFactory.register('environment', type('EnvironmentGeneratorDefault', (EnvironmentGeneratorInterface,), {}))
