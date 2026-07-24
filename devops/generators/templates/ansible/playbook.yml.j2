@@ -1,0 +1,25 @@
+---
+- name: Deploy {{name}} application
+  hosts: app_servers
+  become: true
+  tasks:
+    - name: Ensure Docker is installed
+      apt:
+        name: docker.io
+        state: present
+        update_cache: yes
+
+    - name: Pull application image
+      docker_image:
+        name: "{{docker_image}}"
+        source: pull
+
+    - name: Run application container
+      docker_container:
+        name: "{{name}}"
+        image: "{{docker_image}}"
+        state: started
+        published_ports:
+          - "{{port}}:{{port}}"
+        env:
+          ENVIRONMENT: "{{environment}}"

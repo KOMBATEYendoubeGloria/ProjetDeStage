@@ -1,0 +1,9 @@
+image: alpine:latest
+
+stages:
+  - build
+
+build_job:
+  stage: build
+  script:
+    - echo "Building {{name}}"

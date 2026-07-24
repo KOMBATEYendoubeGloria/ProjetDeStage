@@ -1,0 +1,10 @@
+image: php:8.2
+
+stages:
+  - test
+
+test_job:
+  stage: test
+  script:
+    - composer install
+    - php artisan test

@@ -1,0 +1,11 @@
+image: python:{{version}}
+
+stages:
+  - test
+  - deploy
+
+test_job:
+  stage: test
+  script:
+    - pip install -r requirements.txt
+    - python manage.py test

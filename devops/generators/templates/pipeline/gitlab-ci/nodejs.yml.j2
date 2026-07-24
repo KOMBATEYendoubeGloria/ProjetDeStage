@@ -1,0 +1,10 @@
+image: node:18
+
+stages:
+  - test
+
+test_job:
+  stage: test
+  script:
+    - npm ci
+    - npm test --if-present

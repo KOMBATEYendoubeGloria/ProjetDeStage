@@ -1,0 +1,20 @@
+terraform {
+  required_providers {
+    virtualbox = {
+      source  = "shekeriev/virtualbox"
+      version = "0.0.4"
+    }
+  }
+}
+
+resource "virtualbox_vm" "{{name}}_vm" {
+  name   = "{{name}}"
+  image  = "https://app.vagrantup.com/ubuntu/boxes/bionic64/versions/20201211.0.0/providers/virtualbox.box"
+  cpus   = {{cpu}}
+  memory = "{{memory_mb}} kib"
+
+  network_adapter {
+    type           = "hostonly"
+    host_interface = "vboxnet0"
+  }
+}

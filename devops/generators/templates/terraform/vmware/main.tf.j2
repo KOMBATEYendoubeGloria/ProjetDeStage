@@ -1,0 +1,25 @@
+terraform {
+  required_providers {
+    vsphere = {
+      source  = "hashicorp/vsphere"
+      version = "2.4.0"
+    }
+  }
+}
+
+provider "vsphere" {
+  vsphere_server = "{{vmware_server}}"
+  allow_unverified_ssl = true
+}
+
+resource "vsphere_virtual_machine" "{{name}}_vm" {
+  name             = "{{name}}"
+  num_cpus         = {{cpu}}
+  memory           = {{memory_mb}}
+  guest_id         = "ubuntu64Guest"
+
+  disk {
+    label = "disk0"
+    size  = {{disk_gb}}
+  }
+}

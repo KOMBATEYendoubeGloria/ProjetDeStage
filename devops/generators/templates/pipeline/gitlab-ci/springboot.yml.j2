@@ -1,0 +1,9 @@
+image: maven:3.8.5-openjdk-17
+
+stages:
+  - test
+
+test_job:
+  stage: test
+  script:
+    - mvn test

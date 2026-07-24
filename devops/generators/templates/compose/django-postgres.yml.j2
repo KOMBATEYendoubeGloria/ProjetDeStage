@@ -1,0 +1,32 @@
+version: '3.9'
+
+services:
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:{{port}}
+    volumes:
+      - .:/app
+    ports:
+      - "{{port}}:{{port}}"
+    environment:
+      - POSTGRES_DB={{database_name}}
+      - POSTGRES_USER={{database_user}}
+      - POSTGRES_PASSWORD={{database_password}}
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB={{database_name}}
+      - POSTGRES_USER={{database_user}}
+      - POSTGRES_PASSWORD={{database_password}}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

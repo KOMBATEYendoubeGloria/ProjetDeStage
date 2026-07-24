@@ -1,0 +1,9 @@
+FROM php:8.2-fpm
+WORKDIR /var/www
+RUN apt-get update && apt-get install -y libpng-dev libonig-dev libxml2-dev zip unzip git
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+COPY . .
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN composer install --no-dev --optimize-autoloader
+EXPOSE {{port}}
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port={{port}}"]

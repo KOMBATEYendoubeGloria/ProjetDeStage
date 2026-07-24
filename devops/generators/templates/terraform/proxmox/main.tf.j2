@@ -1,0 +1,31 @@
+terraform {
+  required_providers {
+    proxmox = {
+      source  = "Telmate/proxmox"
+      version = "2.9.14"
+    }
+  }
+}
+
+provider "proxmox" {
+  pm_api_url = "{{proxmox_endpoint}}"
+}
+
+resource "proxmox_vm_qemu" "{{name}}_vm" {
+  name        = "{{name}}"
+  target_node = "pve"
+  cores       = {{cpu}}
+  memory      = {{memory_mb}}
+  sockets     = 1
+
+  disk {
+    size    = "{{disk_gb}}G"
+    type    = "scsi"
+    storage = "local-lvm"
+  }
+
+  network {
+    model  = "virtio"
+    bridge = "vmbr0"
+  }
+}

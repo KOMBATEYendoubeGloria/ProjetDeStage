@@ -1,0 +1,5 @@
+FROM python:{{version}}-slim
+WORKDIR /app
+COPY . .
+EXPOSE {{port}}
+CMD ["python", "main.py"]

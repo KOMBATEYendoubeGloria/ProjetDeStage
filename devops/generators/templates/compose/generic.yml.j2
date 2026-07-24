@@ -1,0 +1,9 @@
+version: '3.9'
+
+services:
+  {{name}}:
+    image: {{docker_image}}
+    ports:
+      - "{{port}}:{{port}}"
+    environment:
+      - ENVIRONMENT={{environment}}

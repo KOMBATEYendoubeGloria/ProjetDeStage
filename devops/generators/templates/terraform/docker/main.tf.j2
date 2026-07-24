@@ -1,0 +1,24 @@
+terraform {
+  required_providers {
+    docker = {
+      source  = "kreuzwerker/docker"
+      version = "3.0.2"
+    }
+  }
+}
+
+provider "docker" {}
+
+resource "docker_image" "{{name}}_image" {
+  name         = "{{docker_image}}"
+  keep_locally = false
+}
+
+resource "docker_container" "{{name}}_container" {
+  image = docker_image.{{name}}_image.image_id
+  name  = "{{name}}"
+  ports {
+    internal = {{port}}
+    external = {{port}}
+  }
+}
