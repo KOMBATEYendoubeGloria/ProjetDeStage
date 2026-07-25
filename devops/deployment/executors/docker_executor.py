@@ -6,10 +6,13 @@ import logging
 import shlex
 import subprocess
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, TYPE_CHECKING
 
 from ..exceptions import DockerExecutorError
 from .base import BaseExecutor
+
+if TYPE_CHECKING:
+    from ..remote.command_runner import CommandRunner
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +22,9 @@ class DockerExecutor(BaseExecutor):
 
     Writes Dockerfile and docker-compose artifacts to the workspace, then
     runs ``docker compose up`` (or ``docker build`` / ``docker run``).
+
+    Supports an optional ``command_runner`` parameter on ``execute()`` and
+    ``teardown()`` for transparent remote execution via SSH.
     """
 
     executor_name = 'docker'
@@ -30,9 +36,11 @@ class DockerExecutor(BaseExecutor):
     # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
-    def _run(self, args: List[str], cwd: Optional[str] = None) -> str:
+    def _run(self, args: List[str], cwd: Optional[str] = None, command_runner: Optional['CommandRunner'] = None) -> str:
         command = [self._binary] + args
         self._log(f'Running: {" ".join(shlex.quote(a) for a in command)}')
+        if command_runner is not None:
+            return command_runner.run(command, cwd=cwd)
         try:
             completed = subprocess.run(
                 command,
@@ -83,7 +91,7 @@ class DockerExecutor(BaseExecutor):
         self._run(['info', '--format', '{{.ServerVersion}}'])
         return True
 
-    def execute(self, workspace: str, artifacts: Dict[str, Any], variables: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def execute(self, workspace: str, artifacts: Dict[str, Any], variables: Optional[Dict[str, Any]] = None, command_runner: Optional['CommandRunner'] = None) -> Dict[str, Any]:
         """Write artifacts and deploy with docker compose."""
         dockerfile = artifacts.get('dockerfile', '')
         compose = artifacts.get('docker_compose', '')
@@ -96,23 +104,23 @@ class DockerExecutor(BaseExecutor):
 
         if compose:
             self._log('Deploying with docker compose')
-            output = self._run(['compose', '-f', 'docker-compose.yml', 'up', '-d'], cwd=workspace)
+            output = self._run(['compose', '-f', 'docker-compose.yml', 'up', '-d'], cwd=workspace, command_runner=command_runner)
             return {'status': 'deployed', 'compose_output': output}
 
         if dockerfile:
             project_name = artifacts.get('metadata', {}).get('project_name', 'app')
             self._log(f'Building Docker image: {project_name}')
-            self._run(['build', '-t', f'{project_name}:latest', '.'], cwd=workspace)
+            self._run(['build', '-t', f'{project_name}:latest', '.'], cwd=workspace, command_runner=command_runner)
             self._log(f'Running container: {project_name}')
-            output = self._run(['run', '-d', '--name', project_name, f'{project_name}:latest'], cwd=workspace)
+            output = self._run(['run', '-d', '--name', project_name, f'{project_name}:latest'], cwd=workspace, command_runner=command_runner)
             return {'status': 'deployed', 'container_id': output}
 
         return {'status': 'no_op'}
 
-    def teardown(self, workspace: str, variables: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def teardown(self, workspace: str, variables: Optional[Dict[str, Any]] = None, command_runner: Optional['CommandRunner'] = None) -> Dict[str, Any]:
         self._log('Stopping and removing Docker containers')
         try:
-            output = self._run(['compose', '-f', 'docker-compose.yml', 'down'], cwd=workspace)
+            output = self._run(['compose', '-f', 'docker-compose.yml', 'down'], cwd=workspace, command_runner=command_runner)
             return {'status': 'stopped', 'down_output': output}
         except DockerExecutorError:
             self._log('docker compose down failed, attempting cleanup')

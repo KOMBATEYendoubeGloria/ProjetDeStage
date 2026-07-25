@@ -8,6 +8,7 @@ from typing import Any, Dict, List, Optional
 
 from ..exceptions import DeploymentEngineError, DeploymentValidationError, RollbackError
 from ..providers.base import ProviderRegistry
+from ..remote.config import RemoteConfig, _is_remote_config
 from ..result import DeploymentResult
 
 logger = logging.getLogger(__name__)
@@ -44,7 +45,7 @@ class DeploymentOrchestrator:
         self.monitoring.track(deployment_id, result)
 
         try:
-            self._validate(project, artifacts)
+            self._validate(project, artifacts, config)
             provider = self._get_provider(provider_name, config)
 
             result.add_log('Provisioning infrastructure')
@@ -121,8 +122,8 @@ class DeploymentOrchestrator:
     # Internal helpers
     # ------------------------------------------------------------------
 
-    def _validate(self, project: Dict[str, Any], artifacts: Dict[str, Any]) -> None:
-        """Validate deployment inputs before execution."""
+    def _validate(self, project: Dict[str, Any], artifacts: Dict[str, Any], config: Optional[Dict[str, Any]] = None) -> None:
+        """Validate deployment inputs before execution, including remote config."""
         if not project:
             raise DeploymentValidationError('Project data is required')
         if not artifacts:
@@ -130,6 +131,11 @@ class DeploymentOrchestrator:
         project_name = project.get('name', '')
         if not project_name:
             raise DeploymentValidationError('Project name is required')
+
+        if config and _is_remote_config(config):
+            remote_config = RemoteConfig.from_config(config)
+            if remote_config:
+                remote_config.validate()
 
     def _get_provider(self, provider_name: str, config: Optional[Dict[str, Any]] = None):
         """Look up and instantiate the provider from the registry."""

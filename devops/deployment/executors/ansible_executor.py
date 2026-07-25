@@ -6,10 +6,13 @@ import logging
 import shlex
 import subprocess
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, TYPE_CHECKING
 
 from ..exceptions import AnsibleExecutorError
 from .base import BaseExecutor
+
+if TYPE_CHECKING:
+    from ..remote.command_runner import CommandRunner
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +22,9 @@ class AnsibleExecutor(BaseExecutor):
 
     Writes playbook and inventory artifacts to the workspace, then runs
     ``ansible-playbook`` against the target hosts.
+
+    Supports an optional ``command_runner`` parameter on ``execute()`` and
+    ``teardown()`` for transparent remote execution via SSH.
     """
 
     executor_name = 'ansible'
@@ -30,9 +36,11 @@ class AnsibleExecutor(BaseExecutor):
     # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
-    def _run(self, args: List[str], cwd: Optional[str] = None) -> str:
+    def _run(self, args: List[str], cwd: Optional[str] = None, command_runner: Optional['CommandRunner'] = None) -> str:
         command = [self._binary] + args
         self._log(f'Running: {" ".join(shlex.quote(a) for a in command)}')
+        if command_runner is not None:
+            return command_runner.run(command, cwd=cwd)
         try:
             completed = subprocess.run(
                 command,
@@ -76,7 +84,7 @@ class AnsibleExecutor(BaseExecutor):
         self._log('Checking Ansible requirements')
         return True
 
-    def execute(self, workspace: str, artifacts: Dict[str, Any], variables: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def execute(self, workspace: str, artifacts: Dict[str, Any], variables: Optional[Dict[str, Any]] = None, command_runner: Optional['CommandRunner'] = None) -> Dict[str, Any]:
         """Write playbook + inventory and run ansible-playbook."""
         playbook = artifacts.get('ansible_playbook', '')
         inventory = artifacts.get('ansible_inventory', '')
@@ -91,10 +99,10 @@ class AnsibleExecutor(BaseExecutor):
             for key, value in variables.items():
                 args.extend(['-e', f'{key}={value}'])
 
-        output = self._run(args, cwd=workspace)
+        output = self._run(args, cwd=workspace, command_runner=command_runner)
         return {'status': 'configured', 'playbook_output': output}
 
-    def teardown(self, workspace: str, variables: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def teardown(self, workspace: str, variables: Optional[Dict[str, Any]] = None, command_runner: Optional['CommandRunner'] = None) -> Dict[str, Any]:
         self._log('Ansible teardown is a no-op (configurations are idempotent)')
         return {'status': 'no_op'}
 

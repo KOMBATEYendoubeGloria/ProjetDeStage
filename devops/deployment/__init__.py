@@ -29,6 +29,8 @@ from .providers.docker_provider import DockerProvider
 from .providers.proxmox_provider import ProxmoxProvider
 from .providers.virtualbox_provider import VirtualBoxProvider
 from .providers.vmware_provider import VMwareProvider
+from .remote.command_runner import LocalCommandRunner, SSHCommandRunner
+from .remote.config import RemoteConfig
 from .result import DeploymentResult
 from .services import DeploymentService
 
@@ -51,4 +53,7 @@ __all__ = [
     'DeploymentOrchestrator',
     'DeploymentResult',
     'DeploymentService',
+    'RemoteConfig',
+    'LocalCommandRunner',
+    'SSHCommandRunner',
 ]

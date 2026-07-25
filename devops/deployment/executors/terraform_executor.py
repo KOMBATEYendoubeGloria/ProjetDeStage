@@ -7,10 +7,13 @@ import logging
 import shlex
 import subprocess
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, TYPE_CHECKING
 
 from ..exceptions import TerraformExecutorError
 from .base import BaseExecutor
+
+if TYPE_CHECKING:
+    from ..remote.command_runner import CommandRunner
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +23,9 @@ class TerraformExecutor(BaseExecutor):
 
     Handles init, validate, plan, apply, destroy, and output operations.
     Writes artifacts to a workspace directory before execution.
+
+    Supports an optional ``command_runner`` parameter on ``execute()`` and
+    ``teardown()`` for transparent remote execution via SSH.
     """
 
     executor_name = 'terraform'
@@ -31,9 +37,11 @@ class TerraformExecutor(BaseExecutor):
     # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
-    def _run(self, args: List[str], cwd: Optional[str] = None) -> str:
+    def _run(self, args: List[str], cwd: Optional[str] = None, command_runner: Optional['CommandRunner'] = None) -> str:
         command = [self._binary] + args
         self._log(f'Running: {" ".join(shlex.quote(a) for a in command)}')
+        if command_runner is not None:
+            return command_runner.run(command, cwd=cwd)
         try:
             completed = subprocess.run(
                 command,
@@ -81,46 +89,46 @@ class TerraformExecutor(BaseExecutor):
         self._run(['validate', '-no-color'], cwd=workspace)
         return True
 
-    def plan(self, workspace: str, variables: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def plan(self, workspace: str, variables: Optional[Dict[str, Any]] = None, command_runner: Optional['CommandRunner'] = None) -> Dict[str, Any]:
         self._log('Running Terraform plan')
         args = ['plan', '-input=false', '-no-color']
         if variables:
             for key, value in variables.items():
                 args.extend(['-var', f'{key}={value}'])
-        output = self._run(args, cwd=workspace)
+        output = self._run(args, cwd=workspace, command_runner=command_runner)
         return {'plan': output}
 
-    def execute(self, workspace: str, artifacts: Dict[str, Any], variables: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def execute(self, workspace: str, artifacts: Dict[str, Any], variables: Optional[Dict[str, Any]] = None, command_runner: Optional['CommandRunner'] = None) -> Dict[str, Any]:
         """Write terraform content, init, and apply."""
         terraform_content = artifacts.get('terraform', '')
         if not terraform_content:
             raise TerraformExecutorError('No terraform artifact provided')
 
         self._write_artifacts(workspace, terraform_content)
-        self.initialize(workspace)
-        self.plan(workspace, variables)
+        self._run(['init', '-input=false'], cwd=workspace, command_runner=command_runner)
+        self.plan(workspace, variables, command_runner=command_runner)
 
         self._log('Applying Terraform configuration')
         args = ['apply', '-input=false', '-auto-approve', '-no-color']
         if variables:
             for key, value in variables.items():
                 args.extend(['-var', f'{key}={value}'])
-        output = self._run(args, cwd=workspace)
+        output = self._run(args, cwd=workspace, command_runner=command_runner)
 
-        tf_output = self.output(workspace)
+        tf_output = self.output(workspace, command_runner=command_runner)
         return {'status': 'applied', 'apply_output': output, 'outputs': tf_output}
 
-    def teardown(self, workspace: str, variables: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def teardown(self, workspace: str, variables: Optional[Dict[str, Any]] = None, command_runner: Optional['CommandRunner'] = None) -> Dict[str, Any]:
         self._log('Destroying Terraform infrastructure')
         args = ['destroy', '-input=false', '-auto-approve', '-no-color']
         if variables:
             for key, value in variables.items():
                 args.extend(['-var', f'{key}={value}'])
-        output = self._run(args, cwd=workspace)
+        output = self._run(args, cwd=workspace, command_runner=command_runner)
         return {'status': 'destroyed', 'destroy_output': output}
 
-    def output(self, workspace: str) -> Dict[str, Any]:
-        raw = self._run(['output', '-json'], cwd=workspace)
+    def output(self, workspace: str, command_runner: Optional['CommandRunner'] = None) -> Dict[str, Any]:
+        raw = self._run(['output', '-json'], cwd=workspace, command_runner=command_runner)
         return json.loads(raw) if raw else {}
 
     def get_logs(self) -> List[str]:
