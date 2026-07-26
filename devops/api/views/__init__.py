@@ -12,6 +12,14 @@ from .artifacts import (
 )
 from .history import GenerationHistoryListView, GenerationHistoryDetailView
 from .health import HealthCheckView
+from .deployment_monitoring import (
+    AsyncDeploymentStartView,
+    AsyncDeploymentStatusView,
+    AsyncDeploymentCancelView,
+    AsyncDeploymentLogsView,
+    AsyncDeploymentEventsView,
+    AsyncDeploymentListView,
+)
 
 __all__ = [
     'AnalyzeView',
@@ -25,4 +33,10 @@ __all__ = [
     'GenerationHistoryListView',
     'GenerationHistoryDetailView',
     'HealthCheckView',
+    'AsyncDeploymentStartView',
+    'AsyncDeploymentStatusView',
+    'AsyncDeploymentCancelView',
+    'AsyncDeploymentLogsView',
+    'AsyncDeploymentEventsView',
+    'AsyncDeploymentListView',
 ]

@@ -33,6 +33,10 @@ from .remote.command_runner import LocalCommandRunner, SSHCommandRunner
 from .remote.config import RemoteConfig
 from .result import DeploymentResult
 from .services import DeploymentService
+from .async_engine import CancellationToken, CancellationError, DeploymentJobManager
+from .events import EventBus
+from .monitoring import DeploymentMonitor, PersistentDeploymentMonitor
+from .progress import StageTracker
 
 __all__ = [
     'DeploymentEngineError',
@@ -56,4 +60,11 @@ __all__ = [
     'RemoteConfig',
     'LocalCommandRunner',
     'SSHCommandRunner',
+    'CancellationToken',
+    'CancellationError',
+    'DeploymentJobManager',
+    'EventBus',
+    'DeploymentMonitor',
+    'PersistentDeploymentMonitor',
+    'StageTracker',
 ]

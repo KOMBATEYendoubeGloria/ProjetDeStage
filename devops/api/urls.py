@@ -12,6 +12,14 @@ from devops.api.views.artifacts import (
     PipelineView,
     TerraformView,
 )
+from devops.api.views.deployment_monitoring import (
+    AsyncDeploymentCancelView,
+    AsyncDeploymentEventsView,
+    AsyncDeploymentListView,
+    AsyncDeploymentLogsView,
+    AsyncDeploymentStartView,
+    AsyncDeploymentStatusView,
+)
 from devops.api.views.health import HealthCheckView
 from devops.api.views.history import GenerationHistoryDetailView, GenerationHistoryListView
 
@@ -33,6 +41,14 @@ urlpatterns = [
     # Generation history
     path('history/', GenerationHistoryListView.as_view(), name='history-list'),
     path('history/<int:pk>/', GenerationHistoryDetailView.as_view(), name='history-detail'),
+
+    # Async deployment monitoring
+    path('deployment/async/start/', AsyncDeploymentStartView.as_view(), name='async-deploy-start'),
+    path('deployment/async/list/', AsyncDeploymentListView.as_view(), name='async-deploy-list'),
+    path('deployment/async/<uuid:deployment_id>/status/', AsyncDeploymentStatusView.as_view(), name='async-deploy-status'),
+    path('deployment/async/<uuid:deployment_id>/cancel/', AsyncDeploymentCancelView.as_view(), name='async-deploy-cancel'),
+    path('deployment/async/<uuid:deployment_id>/logs/', AsyncDeploymentLogsView.as_view(), name='async-deploy-logs'),
+    path('deployment/async/<uuid:deployment_id>/events/', AsyncDeploymentEventsView.as_view(), name='async-deploy-events'),
 
     # Health check
     path('health/', HealthCheckView.as_view(), name='health'),

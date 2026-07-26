@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+import uuid
 
 
 class Environment(models.Model):
@@ -561,4 +562,123 @@ class GenerationHistory(models.Model):
 
     def __str__(self):
         return f"GenerationHistory({self.project_name} - {self.framework} @ {self.created_at})"
+
+
+# ======================================================================
+# Phase 11 — Asynchronous Deployment & Persistent Monitoring
+# ======================================================================
+
+
+class DeploymentJob(models.Model):
+    """An asynchronous deployment job — the queue unit."""
+
+    class Status(models.TextChoices):
+        PENDING = 'PENDING', 'Pending'
+        QUEUED = 'QUEUED', 'Queued'
+        RUNNING = 'RUNNING', 'Running'
+        COMPLETED = 'COMPLETED', 'Completed'
+        FAILED = 'FAILED', 'Failed'
+        CANCELLED = 'CANCELLED', 'Cancelled'
+        ROLLING_BACK = 'ROLLING_BACK', 'Rolling Back'
+        ROLLED_BACK = 'ROLLED_BACK', 'Rolled Back'
+
+    deployment_id = models.UUIDField(unique=True, default=uuid.uuid4, editable=False)
+    provider_name = models.CharField(max_length=50)
+    project_data = models.JSONField()
+    artifacts_data = models.JSONField()
+    config_data = models.JSONField(null=True, blank=True)
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
+    current_stage = models.CharField(max_length=50, blank=True)
+    progress_percent = models.PositiveIntegerField(default=0)
+    started_at = models.DateTimeField(null=True, blank=True)
+    finished_at = models.DateTimeField(null=True, blank=True)
+    error_message = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Deployment Job'
+        verbose_name_plural = 'Deployment Jobs'
+
+    def __str__(self):
+        return f"DeploymentJob({self.deployment_id} - {self.status})"
+
+
+class DeploymentStageProgress(models.Model):
+    """Tracks individual stage progress within a deployment job."""
+
+    class StageStatus(models.TextChoices):
+        PENDING = 'PENDING', 'Pending'
+        RUNNING = 'RUNNING', 'Running'
+        COMPLETED = 'COMPLETED', 'Completed'
+        FAILED = 'FAILED', 'Failed'
+        SKIPPED = 'SKIPPED', 'Skipped'
+
+    job = models.ForeignKey(
+        DeploymentJob,
+        on_delete=models.CASCADE,
+        related_name='stages',
+    )
+    stage_name = models.CharField(max_length=50)
+    status = models.CharField(max_length=20, choices=StageStatus.choices, default=StageStatus.PENDING)
+    progress_percent = models.PositiveIntegerField(default=0)
+    started_at = models.DateTimeField(null=True, blank=True)
+    finished_at = models.DateTimeField(null=True, blank=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['order']
+        verbose_name = 'Deployment Stage Progress'
+        verbose_name_plural = 'Deployment Stage Progress'
+
+    def __str__(self):
+        return f"{self.stage_name} ({self.status})"
+
+
+class DeploymentLogEntry(models.Model):
+    """Persistent log entry for a deployment job."""
+
+    class Level(models.TextChoices):
+        INFO = 'INFO', 'Info'
+        WARNING = 'WARNING', 'Warning'
+        ERROR = 'ERROR', 'Error'
+
+    job = models.ForeignKey(
+        DeploymentJob,
+        on_delete=models.CASCADE,
+        related_name='log_entries',
+    )
+    timestamp = models.DateTimeField(auto_now_add=True)
+    level = models.CharField(max_length=10, choices=Level.choices, default=Level.INFO)
+    message = models.TextField()
+    stage = models.CharField(max_length=50, blank=True)
+
+    class Meta:
+        ordering = ['timestamp']
+        verbose_name = 'Deployment Log Entry'
+        verbose_name_plural = 'Deployment Log Entries'
+
+    def __str__(self):
+        return f"[{self.level}] {self.message[:80]}"
+
+
+class DeploymentEvent(models.Model):
+    """Event published during deployment for monitoring and future WebSocket integration."""
+
+    job = models.ForeignKey(
+        DeploymentJob,
+        on_delete=models.CASCADE,
+        related_name='events',
+    )
+    event_type = models.CharField(max_length=50)
+    payload = models.JSONField(default=dict)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['created_at']
+        verbose_name = 'Deployment Event'
+        verbose_name_plural = 'Deployment Events'
+
+    def __str__(self):
+        return f"{self.event_type} ({self.created_at})"
 
