@@ -1,0 +1,23 @@
+# Backend (repo séparé)
+ProjetDeStage/
+
+# Node
+node_modules/
+dist/
+
+# Environnement
+.env
+.env.local
+
+# OS
+Thumbs.db
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+hs_err_pid*.log
+replay_pid*.log

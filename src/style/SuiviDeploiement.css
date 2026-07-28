@@ -1,0 +1,89 @@
+.tr-page {
+  min-height: 100vh;
+  background: #0d0b1e;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+  box-sizing: border-box;
+}
+
+.tr-card {
+  background: #15132b;
+  border: 1px solid #2a2745;
+  border-radius: 20px;
+  padding: 40px;
+  width: 100%;
+  max-width: 700px;
+}
+
+.tr-title {
+  color: #e5e0f0;
+  text-align: center;
+  font-size: 22px;
+  margin-bottom: 6px;
+}
+
+.tr-subtitle {
+  color: #8b87a3;
+  text-align: center;
+  font-size: 13px;
+  margin-bottom: 30px;
+}
+
+.tr-steps {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+}
+
+.tr-step {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tr-step-box {
+  padding: 14px 18px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  min-width: 130px;
+  border: 1.5px solid #2a2745;
+  color: #8b87a3;
+  background: #0d0b1e;
+  transition: all 0.3s ease;
+}
+
+.tr-step-done .tr-step-box {
+  background: rgba(76, 217, 100, 0.12);
+  border-color: #4cd964;
+  color: #4cd964;
+}
+
+.tr-step-active .tr-step-box {
+  background: rgba(168, 85, 201, 0.15);
+  border-color: #a855c9;
+  color: #fff;
+  box-shadow: 0 0 0 3px rgba(168, 85, 201, 0.2);
+}
+
+.tr-arrow {
+  color: #2a2745;
+  font-size: 16px;
+}
+
+.tr-back {
+  display: block;
+  margin: 30px auto 0;
+  background: transparent;
+  border: 1px solid #2a2745;
+  color: #8b87a3;
+  padding: 10px 20px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 13px;
+}

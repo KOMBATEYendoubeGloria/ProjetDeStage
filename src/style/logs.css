@@ -1,0 +1,101 @@
+.log-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #ffffff;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: #ffffff;
+}
+
+.log-sidebar {
+  width: 250px;
+  background: #7c3aed;
+  padding: 24px 18px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #8b5cf6;
+}
+
+.log-logo { display: flex; align-items: center; gap: 8px; font-weight: 700; margin-bottom: 24px; }
+.log-logo-dot { width: 10px; height: 10px; border-radius: 50%; background: #a855c9; }
+
+.log-search input {
+  width: 100%; box-sizing: border-box; padding: 10px 14px; border-radius: 10px;
+  border: 1px solid #8b5cf6; background: #ffffff; color: #7c3aed; outline: none; font-size: 13px;
+}
+
+.log-nav { margin-top: 24px; flex: 1; }
+.log-nav-title { font-size: 11px; text-transform: uppercase; color: #8b87a3; margin: 18px 0 8px; cursor: pointer; }
+.log-nav-title.active { color: #a855c9; font-weight: 700; }
+.log-nav ul { list-style: none; margin: 0; padding: 0; }
+.log-nav li { padding: 10px 12px; border-radius: 8px; font-size: 14px; cursor: pointer; color: #8b87a3; margin-bottom: 4px; }
+.log-nav li:hover { background: rgba(168,85,201,0.15); }
+
+.log-logout {
+  margin-top: auto; background: #6d28d9;
+  border: none; color: #fff; padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer;
+}
+
+.log-main { flex: 1; padding: 40px 48px; }
+.log-welcome { font-size: 26px; margin: 0 0 20px; color: #7c3aed; }
+
+.log-search-bar { max-width: 320px; margin-bottom: 20px; }
+.log-search-bar input {
+  width: 100%; box-sizing: border-box; padding: 10px 14px; border-radius: 10px;
+  border: 1px solid #2a2745; background: #15132b; color: #e5e0f0; outline: none; font-size: 13px;
+}
+
+.log-history-title { text-align: center; font-size: 20px; margin-bottom: 24px; }
+
+.log-error { color: #e57373; margin-bottom: 16px; }
+.log-loading, .log-empty { color: #8b87a3; text-align: center; padding: 20px; }
+
+.log-table-card { background: #7c3aed; border: 1px solid #8b5cf6; border-radius: 16px; padding: 24px; }
+.log-table-header h2 { margin: 0 0 16px; font-size: 18px; }
+
+.log-table { width: 100%; border-collapse: collapse; }
+.log-table th { text-align: left; font-size: 12px; color: #8b87a3; text-transform: uppercase; padding: 10px 12px; border-bottom: 1px solid #2a2745; }
+.log-table td { padding: 14px 12px; font-size: 14px; border-bottom: 1px solid #2a2745; }
+
+.log-badge { padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+.niveau-info { background: rgba(33,150,243,0.15); color: #2196f3; }
+.niveau-warn { background: rgba(255,193,7,0.15); color: #ffc107; }
+.niveau-error { background: rgba(229,115,115,0.15); color: #e57373; }
+
+.log-actions button { background: none; border: none; cursor: pointer; font-size: 14px; }
+
+@media (max-width: 900px) {
+  .log-layout {
+    flex-direction: column;
+  }
+
+  .log-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #2a2745;
+  }
+
+  .log-main {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 640px) {
+  .log-main {
+    padding: 16px;
+  }
+
+  .log-history-title {
+    font-size: 18px;
+  }
+
+  .log-table-card {
+    padding: 16px;
+    overflow-x: auto;
+  }
+
+  .log-table th,
+  .log-table td {
+    white-space: nowrap;
+    padding: 10px 8px;
+  }
+}

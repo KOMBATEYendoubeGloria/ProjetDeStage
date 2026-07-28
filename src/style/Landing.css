@@ -1,0 +1,231 @@
+:root {
+  --voltra-violet: #2e1065;
+  --voltra-violet-hover: #3b1e7a;
+  --voltra-slate-50: #f8fafc;
+  --voltra-slate-200: #e2e8f0;
+  --voltra-slate-300: #cbd5e1;
+  --voltra-slate-400: #94a3b8;
+  --voltra-slate-500: #64748b;
+}
+
+.voltra-page {
+  min-height: 100vh;
+  width: 100%;
+  background: white;
+  color: var(--voltra-violet);
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+/* HEADER */
+.voltra-header {
+  width: 100%;
+  padding: 20px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--voltra-slate-200);
+}
+
+.voltra-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.voltra-logo-box {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  background: var(--voltra-violet);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+.voltra-logo span {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+
+.voltra-header-right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.voltra-tagline {
+  font-size: 14px;
+  color: var(--voltra-slate-500);
+}
+
+@media (max-width: 640px) {
+  .voltra-tagline { display: none; }
+}
+
+.voltra-btn-outline {
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 4px;
+  border: 1px solid var(--voltra-slate-300);
+  background: #fff;
+  color: #334155;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.voltra-btn-outline:hover {
+  border-color: var(--voltra-violet);
+  color: var(--voltra-violet);
+}
+
+.voltra-btn-lg {
+  height: 48px;
+  padding: 0 28px;
+}
+
+/* MAIN */
+.voltra-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 96px 24px 64px;
+  text-align: center;
+}
+
+.voltra-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 4px;
+  border: 1px solid var(--voltra-slate-200);
+  color: var(--voltra-slate-500);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 28px;
+}
+
+.voltra-title {
+  font-size: 42px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  max-width: 700px;
+  line-height: 1.15;
+  margin: 0;
+}
+
+.voltra-subtitle {
+  margin-top: 24px;
+  font-size: 18px;
+  color: var(--voltra-slate-500);
+  max-width: 560px;
+  line-height: 1.6;
+}
+
+.voltra-cta-group {
+  margin-top: 40px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.voltra-btn-primary {
+  height: 48px;
+  padding: 0 28px;
+  border-radius: 4px;
+  border: none;
+  background: var(--voltra-violet);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.voltra-btn-primary:hover {
+  background: var(--voltra-violet-hover);
+}
+
+/* STATS */
+.voltra-stats {
+  margin-top: 80px;
+  width: 100%;
+  max-width: 760px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 1px solid var(--voltra-slate-200);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.voltra-stat {
+  padding: 28px 32px;
+  text-align: left;
+  border-right: 1px solid var(--voltra-slate-200);
+}
+
+.voltra-stat:last-child { border-right: none; }
+
+.voltra-stat svg { color: var(--voltra-slate-400); margin-bottom: 12px; }
+
+.voltra-stat-value {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.voltra-stat-label {
+  font-size: 14px;
+  color: var(--voltra-slate-500);
+  margin: 4px 0 0;
+}
+
+@media (max-width: 640px) {
+  .voltra-stats { grid-template-columns: 1fr; }
+  .voltra-stat { border-right: none; border-bottom: 1px solid var(--voltra-slate-200); }
+  .voltra-stat:last-child { border-bottom: none; }
+}
+
+/* TRUSTED */
+.voltra-trusted-label {
+  margin-top: 64px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--voltra-slate-400);
+}
+
+.voltra-trusted-logos {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 40px 16px;
+  color: var(--voltra-slate-300);
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: -0.3px;
+}
+
+/* FOOTER */
+.voltra-footer {
+  padding: 24px 32px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--voltra-slate-400);
+  border-top: 1px solid var(--voltra-slate-200);
+}
