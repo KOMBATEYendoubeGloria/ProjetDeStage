@@ -1,8 +1,4 @@
-# DevOps Platform — Tests & Validation
-
-
-## Tests effectués
-
+# DevOps Platform 
 
 Tests couverts :
 - Création d'hyperviseur
@@ -12,7 +8,7 @@ Tests couverts :
 - Enregistrement et gestion des cibles de déploiement (DeploymentTarget)
 - Health checks
 - Endpoints API
-
+- Déploiement continu d'applications 
 ### 2. Tests fonctionnels (via interface)
 
 #### Credentials SSH
